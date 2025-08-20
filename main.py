@@ -53,14 +53,6 @@ class RoundedButton(tk.Canvas):
     def on_leave(self, e):
         """Simple leave effect - restore original color"""
         self.itemconfig(self.rect_id, fill=self.bg, outline=self.bg)
-        
-    def brighten_color(self, color, factor):
-        """Brighten color for hover effect"""
-        if color.startswith('#'):
-            rgb = tuple(int(color[i:i+2], 16) for i in (1, 3, 5))
-            brighter_rgb = tuple(min(255, int(c * factor)) for c in rgb)
-            return f'#{brighter_rgb[0]:02x}{brighter_rgb[1]:02x}{brighter_rgb[2]:02x}'
-        return color
 
 class RoundedFrame(tk.Canvas):
     def __init__(self, parent, bg='#ffffff', corner_radius=15, **kwargs):
@@ -93,7 +85,7 @@ class ChoiceTimerApp:
         self.root = root
         self.root.title("Choice Timer")
         self.root.geometry("1000x700")
-        self.root.configure(bg='#e8f5e8')  # Cute light green background
+        self.root.configure(bg='#e8f5e8')  # Soft matcha green background
         
         # Timer variables
         self.time_left = 0
@@ -112,7 +104,7 @@ class ChoiceTimerApp:
         title_frame.pack(pady=30)
         
         title_label = tk.Label(title_frame, text="Choice Timer", font=("Segoe UI", 32, "bold"), 
-                              bg='#e8f5e8', fg='#2d5a2d')
+                              bg='#e8f5e8', fg='#2d5a2d')  # Dark matcha green
         title_label.pack()
         
         # Main content frame with two columns
@@ -127,7 +119,7 @@ class ChoiceTimerApp:
         timer_container = tk.Frame(left_column, bg='#e8f5e8')
         timer_container.pack(pady=20, fill='x', padx=10)
         
-        timer_frame = RoundedFrame(timer_container, bg='#f0f9f0', corner_radius=35)  # More rounded
+        timer_frame = RoundedFrame(timer_container, bg='#f0f9f0', corner_radius=35)  # Light matcha
         timer_frame.pack(fill='x')
         timer_frame.create_rounded_bg(500, 200)
         
@@ -136,7 +128,7 @@ class ChoiceTimerApp:
         timer_title.pack(pady=(20, 10))
         
         self.time_label = tk.Label(timer_frame, text="00:00", font=("Segoe UI", 48, "bold"), 
-                                  bg='#f0f9f0', fg='#7fb069')
+                                  bg='#f0f9f0', fg='#7fb069')  # Matcha green
         self.time_label.pack(pady=15)
         
         # Timer controls
@@ -145,17 +137,17 @@ class ChoiceTimerApp:
         
         self.start_btn = RoundedButton(controls_frame, text="Start", command=self.start_timer,
                                       bg='#7fb069', fg='white', font=("Segoe UI", 12, "bold"), 
-                                      width=100, height=35, corner_radius=25)  # More rounded
+                                      width=100, height=35, corner_radius=25)  # Matcha green
         self.start_btn.pack(side='left', padx=8)
         
         self.stop_btn = RoundedButton(controls_frame, text="Stop", command=self.stop_timer,
                                      bg='#8fbc8f', fg='white', font=("Segoe UI", 12, "bold"), 
-                                     width=100, height=35, corner_radius=25)  # More rounded
+                                     width=100, height=35, corner_radius=25)  # Sage green
         self.stop_btn.pack(side='left', padx=8)
         
         self.reset_btn = RoundedButton(controls_frame, text="Reset", command=self.reset_timer,
                                       bg='#9dc183', fg='white', font=("Segoe UI", 12, "bold"), 
-                                      width=100, height=35, corner_radius=25)  # More rounded
+                                      width=100, height=35, corner_radius=25)  # Mint green
         self.reset_btn.pack(side='left', padx=8)
         
         # Time input
@@ -173,9 +165,9 @@ class ChoiceTimerApp:
         choice_container = tk.Frame(left_column, bg='#e8f5e8')
         choice_container.pack(pady=20, fill='x', padx=10)
         
-        choice_frame = RoundedFrame(choice_container, bg='#f0f9f0', corner_radius=35)  # More rounded
+        choice_frame = RoundedFrame(choice_container, bg='#f0f9f0', corner_radius=35)
         choice_frame.pack(fill='x')
-        choice_frame.create_rounded_bg(500, 200)  # Increased height to fit input better
+        choice_frame.create_rounded_bg(500, 250)
         
         choice_title = tk.Label(choice_frame, text="Make your choice", bg='#f0f9f0', 
                                font=("Segoe UI", 18, "bold"), fg='#2d5a2d')
@@ -186,14 +178,31 @@ class ChoiceTimerApp:
         choices_frame.pack(pady=20)
         
         self.choice_buttons = {}
-        choice_colors = {'A': '#7fb069', 'B': '#8fbc8f', 'C': '#9dc183', 'D': '#a8d5a8'}
+        choice_colors = {'A': '#7fb069', 'B': '#8fbc8f', 'C': '#9dc183', 'D': '#a8d5a8'}  # Matcha greens
         
         for choice in ['A', 'B', 'C', 'D']:
             btn = RoundedButton(choices_frame, text=choice, command=lambda c=choice: self.make_choice(c),
                                bg=choice_colors[choice], fg='white', font=("Segoe UI", 20, "bold"),
-                               width=90, height=65, corner_radius=40)  # Much more rounded
+                               width=90, height=65, corner_radius=40)
             btn.pack(side='left', padx=12)
             self.choice_buttons[choice] = btn
+        
+        # Other input section
+        other_frame = tk.Frame(choice_frame, bg='#f0f9f0')
+        other_frame.pack(pady=15)
+        
+        other_label = tk.Label(other_frame, text="Other:", bg='#f0f9f0', 
+                              font=("Segoe UI", 12), fg='#2d5a2d')
+        other_label.pack(side='left')
+        
+        self.other_entry = tk.Entry(other_frame, width=8, font=("Segoe UI", 14), 
+                                   relief='solid', bd=1)
+        self.other_entry.pack(side='left', padx=10)
+        
+        other_btn = RoundedButton(other_frame, text="Add", command=self.add_other_choice,
+                                 bg='#b8d4b8', fg='white', font=("Segoe UI", 11, "bold"), 
+                                 width=60, height=30, corner_radius=15)  # Soft matcha
+        other_btn.pack(side='left', padx=5)
         
         # Right column - History
         right_column = tk.Frame(main_frame, bg='#e8f5e8')
@@ -203,7 +212,7 @@ class ChoiceTimerApp:
         history_container = tk.Frame(right_column, bg='#e8f5e8')
         history_container.pack(fill='both', expand=True, padx=10)
         
-        history_frame = RoundedFrame(history_container, bg='#f0f9f0', corner_radius=35)  # More rounded
+        history_frame = RoundedFrame(history_container, bg='#f0f9f0', corner_radius=35)
         history_frame.pack(fill='both', expand=True)
         history_frame.create_rounded_bg(400, 500)
         
@@ -218,7 +227,7 @@ class ChoiceTimerApp:
         # LAP button on first line
         lap_btn = RoundedButton(button_frame, text="LAP", command=self.add_lap_separator,
                                 bg='#9dc183', fg='white', font=("Segoe UI", 11, "bold"), 
-                                width=70, height=30, corner_radius=20)  # More rounded
+                                width=70, height=30, corner_radius=20)  # Mint green
         lap_btn.pack(side='right')
         
         # Export button on second line
@@ -227,7 +236,7 @@ class ChoiceTimerApp:
         
         export_btn = RoundedButton(export_frame, text="Export", command=self.export_answers,
                                   bg='#7fb069', fg='white', font=("Segoe UI", 11, "bold"), 
-                                  width=90, height=30, corner_radius=20)  # More rounded
+                                  width=90, height=30, corner_radius=20)  # Matcha green
         export_btn.pack(side='right')
         
         # Choice listbox with scrollbar
@@ -245,7 +254,7 @@ class ChoiceTimerApp:
         # Clear history button
         clear_btn = RoundedButton(history_frame, text="Clear", command=self.clear_history,
                                  bg='#b8d4b8', fg='white', font=("Segoe UI", 11, "bold"), 
-                                 width=100, height=30, corner_radius=20)  # More rounded
+                                 width=100, height=30, corner_radius=20)  # Soft matcha
         clear_btn.pack(pady=20)
         
     def export_answers(self):
@@ -328,6 +337,7 @@ class ChoiceTimerApp:
         self.timer_running = False
         self.start_btn.config(state='normal')
         self.time_label.config(text="00:00")
+        messagebox.showinfo("Time's up!", "Timer finished!")
     
     def stop_timer(self):
         self.timer_running = False
@@ -355,6 +365,21 @@ class ChoiceTimerApp:
         # Auto-reset highlight after 2 seconds
         self.root.after(2000, lambda: self.choice_buttons[choice].itemconfig(1, outline=self.choice_buttons[choice].bg))
     
+    def add_other_choice(self):
+        """Add custom choice from Other input field"""
+        other_text = self.other_entry.get().strip().upper()
+        if other_text:
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            choice_text = f"[{timestamp}] {other_text}"
+            self.choices.append(choice_text)
+            self.choice_listbox.insert(tk.END, choice_text)
+            self.choice_listbox.see(tk.END)
+            
+            # Clear the input field
+            self.other_entry.delete(0, tk.END)
+        else:
+            messagebox.showwarning("Warning", "Please enter something in the Other field!")
+    
     def clear_history(self):
         self.choices.clear()
         self.choice_listbox.delete(0, tk.END)
@@ -372,4 +397,4 @@ def main():
     root.mainloop()
 
 if __name__ == "__main__":
-    main()
+    main() 
